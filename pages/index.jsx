@@ -1,39 +1,12 @@
-import appConfig from '../config.json'
-import {Box, Button, Text, TextField, Image} from '@skynexui/components'
-
+import appConfig from '../config.json';
+import {Box, Button, Text, TextField, Image} from '@skynexui/components';
+import React from 'react';
+import {useRouter} from 'next/router'
 // criando um reset de css
-function GlobalStyle() {
-  return (
-    <style global jsx>{`
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        list-style: none;
-      }
-      body {
-        font-family: 'Open Sans', sans-serif;
-      }
-      /* App fit Height */ 
-      html, body, #__next {
-        min-height: 100vh;
-        display: flex;
-        flex: 1;
-      }
-      #__next {
-        flex: 1;
-      }
-      #__next > * {
-        flex: 1;
-      }
-      /* ./App fit Height */ 
-    `}</style>
-  );
-}
 
 
-//componente react
-//props 
+
+//componente react Titulo!!!
 function Titulo (props){
   console.log(props)
   //props é como se fosse um prototype, posso criar varias propriedades para o meu componente e chamar ela
@@ -42,8 +15,10 @@ function Titulo (props){
   return(
     //para não retornar apenas uma div usamos <> e </>
     <>
-    {/* o children é um valor que ja retorna com o conteudo que está dentro da Tag onde o componente é chamado */}
       <Tag>{props.children}</Tag>
+
+
+      {/* estilos próprios do componente de Titulo */}
       <style jsx>{`
       ${Tag}{
         color: ${appConfig.theme.colors.primary[400]};
@@ -73,11 +48,24 @@ function Titulo (props){
 //   export default HomePage
 
 export default function PaginaInicial() {
-  const username = 'pedroaurelli';
+  // a variavel nao pode ser só um texto!
+  //tem que ser um valor que muda de estado no react
+  // const username = 'pedroaurelli';
+
+  //use state me retorna duas coisas
+  //o username e o setUsername
+  //o setUserName que é a "const" que ger apra mim a nova "foto" da pagina
+  //o setuserName é uma função onde eu posso colocar um parametro dentro dela, 
+  //que serám o valor atualizado!
+  const [username, setUserName] = React.useState('pedroaurelli')
+  
+  
+  //Hooks de roteamento de pagina do next {importar o hook router}
+  //para trocar a a pagina sem "atualizar" ela
+  const roteamento = useRouter()
 
   return (
     <>
-      <GlobalStyle />
       <Box
         styleSheet={{
           display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -104,6 +92,17 @@ export default function PaginaInicial() {
           {/* Formulário */}
           <Box
             as="form"
+            //devo evitar o maximo esse refresh da pagina com react 
+            //e atualizar somento o necessario
+            onSubmit={function(e){
+              //para isso deve previnir o evento do botao como default
+              e.preventDefault()
+              console.log('enviou', username)
+
+              //não faz mais o refresh, só muda os pedaços que precisava
+              roteamento.push('/chat')
+              
+            }}
             styleSheet={{
               display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
               width: { xs: '100%', sm: '50%' }, textAlign: 'center', marginBottom: '32px',
@@ -114,7 +113,25 @@ export default function PaginaInicial() {
               {appConfig.name}
             </Text>
 
+            {/* <input 
+            type="text"
+            value={username}
+            onChange={function handler(e){
+              //onde ta o evento??
+              const valor = e.target.value
+              //trocar o valor da variavel ao digitar!
+              setUserName(valor)
+            }}
+            /> */}
             <TextField
+            value={username}
+            onChange={function handler(e){
+              //onde ta o evento??
+              const valor = e.target.value
+              //trocar o valor da variavel ao digitar!
+              setUserName(valor)
+            }}
+
               fullWidth
               textFieldColors={{
                 neutral: {
