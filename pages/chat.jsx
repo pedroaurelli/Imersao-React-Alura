@@ -1,12 +1,27 @@
 import { Box, Text, TextField, Image, Button } from '@skynexui/components';
 import React, { useState } from 'react';
 import appConfig from '../config.json';
+import { createClient } from '@supabase/supabase-js'
+
+//CHAVES QUE PEGUEI NO MEU SUPABASE!
+const SUPABASE_ANNON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0MzM0MjcxMSwiZXhwIjoxOTU4OTE4NzExfQ.G688L_k-ihPYxZlv_HUUyywG-nFZzB0p6rYLxLoqjYE'
+const SUPABASE_URL = 'https://yehytgarfkgerkzszggo.supabase.co'
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANNON_KEY)
+
+//pegando meus dados no supabase, parece muito um select com sql
+
+
 
 export default function ChatPage() {
+
+    
 
     const [mensagem, setMensagem] = React.useState('')
 
     //useState para a lista de mensagens
+
+    //vou ter que criar no supabase o array que esta no useState com todos os campos que eu espero que ele tenha
+
     const [listaDeMensagem, setListaDeMensagem] = React.useState([])
     // Sua lógica vai aqui
     //USUARIO
@@ -20,12 +35,41 @@ export default function ChatPage() {
     // [X] - usar onChange e usar useState (condição para caso seja enter)
     // [X] - lista de mensagens
 
+
+    React.useEffect(()=>{
+        supabaseClient
+            .from('mensagens')
+            .select('*')
+            .order('id', {ascending: false})
+            .then((dados) =>{
+                console.log('Dados da consulta', dados)
+                setListaDeMensagem(dados.data)
+            })
+            //é como se fosse o observador do javascript
+            //a função de useEffect só vai ser acionada quado a listaDeMensagem mudar
+            
+    }, [])
+
     function handleNovaMensagem (novaMensagem){
         const mensagem = {
             texto: novaMensagem,
-            de: 'Pedro Aureliano',
-            id: listaDeMensagem.length + 1
+            de: 'pedroaurelli',
+            // id: listaDeMensagem.length + 1
         }
+
+        supabaseClient
+            .from('mensagens')
+            .insert([
+                mensagem
+            ])
+            .then(({data})=>{
+                console.log('Criando mensagem', data)
+                setListaDeMensagem([
+                    data[0],
+                    ...listaDeMensagem
+                ])
+            })
+
         setListaDeMensagem([
 
             mensagem, ...listaDeMensagem 
@@ -39,7 +83,7 @@ export default function ChatPage() {
         <Box
             styleSheet={{
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                backgroundColor: appConfig.theme.colors.primary[500],
+                backgroundColor: appConfig.theme.colors.primary[600],
                 backgroundRepeat: 'no-repeat', backgroundSize: 'cover', backgroundBlendMode: 'multiply',
                 color: appConfig.theme.colors.neutrals['000']
             }}
@@ -53,7 +97,7 @@ export default function ChatPage() {
                     borderRadius: '5px',
                     backgroundColor: appConfig.theme.colors.neutrals[700],
                     height: '100%',
-                    maxWidth: '95%',
+                    maxWidth: '65%',
                     maxHeight: '95vh',
                     padding: '32px',
                 }}
@@ -128,7 +172,22 @@ export default function ChatPage() {
                                 color: appConfig.theme.colors.neutrals[200],
                             }}
                         />
-
+                            <Button 
+                                label='Enviar'
+                                onClick={() => handleNovaMensagem(mensagem)}
+                                buttonColors={{
+                                    contrastColor: appConfig.theme.colors.neutrals["100"],
+                                    mainColor: appConfig.theme.colors.primary[500],
+                                    mainColorLight: appConfig.theme.colors.primary[400],
+                                    mainColorStrong: appConfig.theme.colors.primary[600],
+                                }}
+                                styleSheet={{
+                                    width: '100px',
+                                    marginBottom: '7px',
+                                    padding: '13px 0px'
+                                }}
+                            />
+                            
                             {/* LUGAR ONDE VAI FICAR O MEU BTN DE ENVIAR */}
 
                     </Box>
@@ -137,6 +196,8 @@ export default function ChatPage() {
         </Box>
     )
 }
+
+
 
 function Header() {
     return (
@@ -198,7 +259,7 @@ function MessageList(props) {
                             display: 'inline-block',
                             marginRight: '8px',
                         }}
-                        src={`https://github.com/vanessametonini.png`}
+                        src={`https://github.com/${mensagem.de}.png`}
                     />
                     <Text tag="strong">
                         {mensagem.de}
