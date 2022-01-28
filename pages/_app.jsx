@@ -9,7 +9,10 @@ function GlobalStyle() {
           padding: 0;
           box-sizing: border-box;
           list-style: none;
+          list-style:none;
+    
         }
+
         body {
           font-family: 'Open Sans', sans-serif;
         }
