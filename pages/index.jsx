@@ -97,10 +97,10 @@ export default function PaginaInicial() {
             onSubmit={function(e){
               //para isso deve previnir o evento do botao como default
               e.preventDefault()
-              console.log('enviou', username)
+              console.log(`enviou`, username)
 
               //não faz mais o refresh, só muda os pedaços que precisava
-              roteamento.push('/chat')
+              roteamento.push(`/chat?username=${username}`)
               
             }}
             styleSheet={{
